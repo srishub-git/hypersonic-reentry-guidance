@@ -1,6 +1,6 @@
-# 🔥 Hypersonic Reentry Guidance via Hybrid Optimal Control & Reinforcement Learning
+# Hypersonic Reentry Guidance through Hybrid Optimal Control & Reinforcement Learning
 
-> A graduate-level personal project implementing reference trajectory generation and RL-based guidance for a hypersonic reentry vehicle under aerothermal, g-load, and dynamic pressure constraints.
+> A graduate level personal project implementing reference trajectory generation and RL based guidance for a hypersonic reentry vehicle under aerothermal, g-load, and dynamic pressure constraints.
 
 ---
 
@@ -59,42 +59,7 @@ hypersonic-reentry-guidance/
 | Normal g-load | ≤ 4 g |
 | Dynamic pressure | ≤ 50 kPa |
 
----
 
-## Phases
-
-### Phase 1 — Dynamics & Environment (Week 1)
-- [x] 3DOF equations of motion
-- [ ] Constraint models (Chapman heating, dynamic pressure)
-- [ ] Custom Gymnasium environment
-- [ ] Baseline simulation & visualization
-
-### Phase 2 — Reference Trajectory (Week 2)
-- [ ] Predictor-corrector guidance baseline
-- [ ] Drag modulation corridor (ADRC-style)
-- [ ] Trajectory visualization
-
-### Phase 3 — RL Policy (Weeks 3–4)
-- [ ] PPO training on nominal environment
-- [ ] Domain randomization (atmospheric uncertainty)
-- [ ] Policy evaluation vs. classical baseline
-
-### Phase 4 — Results & Writeup (Week 5–6)
-- [ ] Monte Carlo dispersions
-- [ ] Comparison plots
-- [ ] Final writeup / report
-
----
-
-## Setup
-
-```bash
-conda create -n reentry python=3.10
-conda activate reentry
-pip install -r requirements.txt
-```
-
----
 
 ## References
 
@@ -103,8 +68,3 @@ pip install -r requirements.txt
 3. Schulman et al. (2017) — *Proximal Policy Optimization Algorithms*
 4. Chapman (1958) — *An Approximate Analytical Method for Studying Entry into Planetary Atmospheres*
 
----
-
-## Author
-
-Personal project — actively in development (May–July 2026)
