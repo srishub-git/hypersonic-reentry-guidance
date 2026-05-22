@@ -1,34 +1,40 @@
-# Hypersonic Reentry Guidance through Hybrid Optimal Control & Reinforcement Learning
+# Hypersonic Reentry Guidance through Hybrid Optimal Control and Reinforcement Learning
 
-> A personal project implementing reference trajectory generation and RL based guidance for a hypersonic reentry vehicle under aerothermal, g-load, and dynamic pressure constraints.
+This project investigates guidance strategies for hypersonic reentry vehicles under strict path constraints. The core idea is to combine classical optimal control used to generate a reference trajectory with a deep reinforcement learning policy (PPO) that learns to track that reference under atmospheric uncertainty and sensor noise.
 
----
-
-## Motivation
-
-Hypersonic reentry guidance is one of the most constrained trajectory optimization problems in aerospace engineering. The vehicle must:
-- Survive extreme aerodynamic heating (heat rate and heat load limits)
-- Keep structural g-loads within human/payload tolerance
-- Hit a precise landing target (cross-range and downrange)
-- Do all of this with significant model uncertainty
-
-Classical approaches (Predictor-Corrector, Apollo) work but are brittle to uncertainty. This project combines **optimal control** (reference trajectory generation) with **deep RL (PPO)** to learn a robust guidance policy that tracks the reference under simulated sensor noise and atmospheric uncertainty.
+The motivation comes from the fact that classical predictor-corrector guidance methods, while reliable, are weak to dispersions in atmospheric density and vehicle aerodynamics. A learned policy trained with domain randomization can potentially generalize better across these uncertainties while still respecting hard physical constraints on heating, g-load, and dynamic pressure.
 
 ---
 
-## Project Structure
+## Problem Statement
+
+A lifting reentry vehicle enters the atmosphere at approximately 7,800 m/s from 120 km altitude (NASA.gov). The guidance system must modulate the bank angle to control the lift vector, shaping the trajectory to hit a downrange target while keeping the vehicle within a safe flight corridor defined by:
+
+- Stagnation heat rate: <= 1500 kW/m²
+- Normal load factor: <= 4 g
+- Dynamic pressure: <= 50 kPa
+
+---
+
+## Approach
+
+The project is structured in two phases. First, a reference trajectory is generated using a predictor-corrector scheme based on drag modulation. Second, a PPO agent is trained in a custom Gymnasium environment to track this reference under randomized initial conditions and atmospheric perturbations.
+
+---
+
+## Repository Structure
 
 ```
 hypersonic-reentry-guidance/
 ├── dynamics/
-│   └── reentry_dynamics.py        # 3DOF equations of motion
+│   └── reentry_dynamics.py        # 3DOF equations of motion, atmosphere model, constraint functions
 ├── envs/
-│   └── reentry_env.py             # Custom Gymnasium environment
+│   └── reentry_env.py             # Custom Gymnasium environment for RL training
 ├── reference/
-│   └── predictor_corrector.py     # Classical baseline guidance
+│   └── predictor_corrector.py     # Classical baseline guidance (to be implemented)
 ├── training/
-│   └── train_ppo.py               # PPO training script
-├── results/                       # Saved models, plots
+│   └── train_ppo.py               # PPO training script using Stable Baselines3
+├── results/                       # Saved models, training curves, trajectory plots
 ├── notebooks/
 │   └── 01_dynamics_exploration.ipynb
 ├── requirements.txt
@@ -37,34 +43,27 @@ hypersonic-reentry-guidance/
 
 ---
 
-## Vehicle & Mission Parameters
+## Vehicle Parameters
 
 | Parameter | Value |
 |---|---|
-| Vehicle | Generic lifting body (Apollo-class) |
+| Vehicle class | Apollo-class lifting body |
+| Mass | 2800 kg |
+| Reference area | 12 m² |
+| Drag coefficient | 1.2 |
+| Lift-to-drag ratio | 0.25 |
+| Nose radius | 0.3 m |
 | Entry altitude | 120 km |
 | Entry velocity | 7,800 m/s |
-| Entry flight path angle | -5.5° |
-| Ballistic coefficient | ~100 kg/m² |
-| Target downrange | 8,000 km |
+| Entry flight path angle | -5.5 deg |
 
 ---
-
-## Constraints
-
-| Constraint | Limit |
-|---|---|
-| Stagnation heat rate | ≤ 1500 kW/m² |
-| Total heat load | ≤ 300 MJ/m² |
-| Normal g-load | ≤ 4 g |
-| Dynamic pressure | ≤ 50 kPa |
 
 
 
 ## References
 
-1. Shen & Lu (2003) — *Onboard Generation of Three-Dimensional Constrained Entry Trajectories*
-2. Vinh et al. — *Hypersonic and Planetary Entry Flight Mechanics* (textbook)
-3. Schulman et al. (2017) — *Proximal Policy Optimization Algorithms*
-4. Chapman (1958) — *An Approximate Analytical Method for Studying Entry into Planetary Atmospheres*
-
+1. Vinh, N.X., Busemann, A., Culp, R.D. — *Hypersonic and Planetary Entry Flight Mechanics*, University of Michigan Press
+2. Shen, Z., Lu, P. (2003) — *Onboard Generation of Three-Dimensional Constrained Entry Trajectories*
+3. Chapman, D.R. (1958) — *An Approximate Analytical Method for Studying Entry into Planetary Atmospheres*, NACA TN-4276
+4. Schulman, J. et al. (2017) — *Proximal Policy Optimization Algorithms*, arXiv:1707.06347
