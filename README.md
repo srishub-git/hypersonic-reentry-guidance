@@ -1,6 +1,6 @@
 # Hypersonic Reentry Guidance through Hybrid Optimal Control & Reinforcement Learning
 
-> A graduate level personal project implementing reference trajectory generation and RL based guidance for a hypersonic reentry vehicle under aerothermal, g-load, and dynamic pressure constraints.
+> A personal project implementing reference trajectory generation and RL based guidance for a hypersonic reentry vehicle under aerothermal, g-load, and dynamic pressure constraints.
 
 ---
 
