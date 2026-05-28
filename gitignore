@@ -1,18 +1,33 @@
+# Python cache files
 __pycache__/
 *.py[cod]
 *.pyo
+
+# PyCharm settings
+.idea/
+
+# Environment
 .env
 .venv
 env/
 venv/
+
+# Distribution
 *.egg-info/
 dist/
 build/
+
+# Jupyter
 .ipynb_checkpoints/
+
+# Results (models and logs are large, keep plots)
 results/models/
 results/logs/
+
+# Compiled files
 *.zip
 *.pkl
 *.pt
-*.png
+
+# Keep results folder tracked
 !results/.gitkeep
