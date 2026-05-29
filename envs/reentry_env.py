@@ -29,8 +29,8 @@ QDOT_LIMIT  = 1.5e6     # W/m^2   (1500 kW/m^2)
 NLOAD_LIMIT = 4.0       # g
 QDYN_LIMIT  = 50e3      # Pa      (50 kPa)
 H_TERMINAL  = 5_000.0   # m       (end of guidance phase)
-R_TARGET    = 8_000e3   # m       (8000 km downrange target)
-R_TOL       = 50e3      # m       (±50 km acceptable miss)
+R_TARGET    = 1_000e3   # m       (8000 km downrange target)
+R_TOL       = 20e3      # m       (±50 km acceptable miss)
 
 
 class ReentryEnv(gym.Env):

@@ -21,8 +21,8 @@ from dynamics.reentry_dynamics import (
 )
 
 # Mission Target
-R_TARGET = 8_000e3      # 8000 km in meters
-R_TOL    = 50e3         # acceptable miss distance (50 km)
+R_TARGET = 1_000e3      # 8000 km in meters
+R_TOL    = 20e3         # acceptable miss distance (50 km)
 H_TERMINAL = 5_000.0   # guidance ends at 5 km altitude
 
 """
@@ -132,3 +132,23 @@ if __name__ == "__main__":
     print(f"  Predicted landing with that sigma = {r_check/1e3:.0f} km")
     print(f"  Target = {R_TARGET/1e3:.0f} km")
     print(f"  Miss = {abs(r_check - R_TARGET)/1e3:.1f} km")
+
+    print("\nTesting under atmospheric uncertainty...")
+    from dynamics.reentry_dynamics import exponential_atmosphere
+    import unittest.mock as mock
+
+    misses = []
+    for perturbation in [-0.2, -0.1, 0.0, 0.1, 0.2]:
+        # Perturb density by scaling RHO_SL
+        import dynamics.reentry_dynamics as dyn
+
+        original = dyn.RHO_SL
+        dyn.RHO_SL = original * (1 + perturbation)
+
+        sigma = corrector(state0, vehicle)
+        r_check = predict_landing(state0, sigma, vehicle)
+        miss = abs(r_check - R_TARGET) / 1e3
+        misses.append(miss)
+        print(f"  Density {perturbation * 100:+.0f}%: sigma={np.degrees(sigma):.1f} deg, miss={miss:.1f} km")
+
+        dyn.RHO_SL = original  # restore
