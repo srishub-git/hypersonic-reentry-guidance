@@ -161,27 +161,31 @@ class ReentryEnv(gym.Env):
         constraints = self._compute_constraints()
 
         # ── Termination conditions
-        terminated = h <= H_TERMINAL or v < 500.0 or h > 130_000.0
-        truncated  = self.t > 4000.0    # max episode length
+        terminated = h <= H_TERMINAL or h > 130_000.0
+        truncated = self.t > 4000.0  # max episode length
 
         # ── Reward shaping
-        reward = 0.1    # small survival reward each step
+        reward = 0.1  # small survival reward each step
+
+        # Penalty for losing velocity too early
+        if v < 1000 and h > 20_000:
+            reward -= 0.5 * (1000 - v) / 1000
 
         # Constraint violation penalties
-        if constraints['qdot']  > QDOT_LIMIT:
+        if constraints['qdot'] > QDOT_LIMIT:
             reward -= 2.0 * (constraints['qdot'] / QDOT_LIMIT - 1.0)
         if constraints['nload'] > NLOAD_LIMIT:
             reward -= 2.0 * (constraints['nload'] / NLOAD_LIMIT - 1.0)
-        if constraints['qdyn']  > QDYN_LIMIT:
+        if constraints['qdyn'] > QDYN_LIMIT:
             reward -= 1.0 * (constraints['qdyn'] / QDYN_LIMIT - 1.0)
 
         # Terminal reward: miss distance from target
         if terminated:
             miss = abs(r - R_TARGET)
             if miss < R_TOL:
-                reward += 50.0 - 50.0 * (miss / R_TOL)   # up to +50
+                reward += 50.0 - 50.0 * (miss / R_TOL)
             else:
-                reward -= 20.0 * (miss / R_TOL)           # penalize large miss
+                reward -= 20.0 * (miss / R_TOL)
 
         info = {
             't':     self.t,
