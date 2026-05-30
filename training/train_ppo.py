@@ -25,10 +25,11 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 os.makedirs(LOG_DIR,   exist_ok=True)
 
 # ── Hyperparameters
-N_ENVS        = 8           # parallel environments
-TOTAL_STEPS   = 1_000_000  # increase to 3M for best results
+N_ENVS        = 4           # parallel environments
+TOTAL_STEPS   = 500_000  # increase to 3M for best results
 EVAL_FREQ     = 20_000
 N_EVAL_EPS    = 10
+R_TARGET = 1_000e3
 
 def make_train_env():
     """Training env with noise (domain randomization)."""
@@ -105,21 +106,20 @@ if __name__ == "__main__":
     # ── Quick evaluation
     print("\nRunning final evaluation (10 episodes)...")
     model = PPO.load(os.path.join(MODEL_DIR, "best_model"))
-    obs, _ = eval_env.reset()
 
     rewards, misses = [], []
     for ep in range(10):
-        obs, _ = eval_env.reset()
+        obs, _ = eval_env.envs[0].reset()
         ep_reward, done = 0, False
         while not done:
-            action, _ = model.predict(obs, deterministic=True)
+            action, _ = model.predict(obs.reshape(1, -1), deterministic=True)
             obs, reward, terminated, truncated, info = eval_env.envs[0].step(action[0])
             ep_reward += reward
             done = terminated or truncated
-        miss = abs(info['r'] - 8_000e3) / 1e3
-        print(f"  Ep {ep+1:2d}: reward={ep_reward:7.1f} | miss={miss:.1f} km | h_final={info['h']/1e3:.1f} km")
+        miss = abs(info['r'] - R_TARGET) / 1e3
+        print(f"  Ep {ep + 1:2d}: reward={ep_reward:7.1f} | miss={miss:.1f} km | h_final={info['h'] / 1e3:.1f} km")
         rewards.append(ep_reward)
         misses.append(miss)
 
-    print(f"\nMean reward: {np.mean(rewards):.1f} ± {np.std(rewards):.1f}")
-    print(f"Mean miss:   {np.mean(misses):.1f} ± {np.std(misses):.1f} km")
+    print(f"\nMean reward: {np.mean(rewards):.1f} +/- {np.std(rewards):.1f}")
+    print(f"Mean miss:   {np.mean(misses):.1f} +/- {np.std(misses):.1f} km")
