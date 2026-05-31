@@ -26,7 +26,7 @@ os.makedirs(LOG_DIR,   exist_ok=True)
 
 # ── Hyperparameters
 N_ENVS        = 4           # parallel environments
-TOTAL_STEPS   = 500_000  # increase to 3M for best results
+TOTAL_STEPS   = 2_000_000  # increase to 3M for best results
 EVAL_FREQ     = 20_000
 N_EVAL_EPS    = 10
 R_TARGET = 1_000e3

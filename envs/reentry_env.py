@@ -68,8 +68,8 @@ class ReentryEnv(gym.Env):
 
         # ── Observation space: 6 normalized states
         self.observation_space = spaces.Box(
-            low  = -np.ones(6, dtype=np.float32),
-            high =  np.ones(6, dtype=np.float32),
+            low  = -np.ones(7, dtype=np.float32),
+            high =  np.ones(7, dtype=np.float32),
         )
 
         # Normalization references
@@ -95,11 +95,12 @@ class ReentryEnv(gym.Env):
         nload   = normal_load_factor(L, D, self.vehicle.mass, gamma)
 
         obs = np.array([
-            h     / self._h_ref,
-            v     / self._v_ref,
+            h / self._h_ref,
+            v / self._v_ref,
             gamma / self._g_ref,
-            r     / self._r_ref,
-            qdot  / self._qdot_ref,
+            r / self._r_ref,
+            (R_TARGET - r) / self._r_ref,  # ADD THIS -- range error
+            qdot / self._qdot_ref,
             nload / self._nload_ref,
         ], dtype=np.float32)
 
@@ -167,6 +168,10 @@ class ReentryEnv(gym.Env):
         # ── Reward shaping
         reward = 0.1  # small survival reward each step
 
+        # Progress reward -- encourage moving toward target
+        r_error = abs(r - R_TARGET) / R_TARGET  # normalized distance from target
+        reward += 0.2 * (1.0 - r_error)  # closer to target = more reward
+
         # Penalty for losing velocity too early
         if v < 1000 and h > 20_000:
             reward -= 0.5 * (1000 - v) / 1000
@@ -181,11 +186,12 @@ class ReentryEnv(gym.Env):
 
         # Terminal reward: miss distance from target
         if terminated:
-            miss = abs(r - R_TARGET)
+            miss = abs(r - R_TARGET)  # in meters
+            miss_km = miss / 1e3  # in km
             if miss < R_TOL:
-                reward += 50.0 - 50.0 * (miss / R_TOL)
+                reward += 100.0 - 100.0 * (miss / R_TOL)
             else:
-                reward -= 20.0 * (miss / R_TOL)
+                reward -= np.exp(miss_km/50) - 1  # your linear penalty
 
         info = {
             't':     self.t,
