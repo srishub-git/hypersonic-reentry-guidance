@@ -186,12 +186,20 @@ class ReentryEnv(gym.Env):
 
         # Terminal reward: miss distance from target
         if terminated:
-            miss = abs(r - R_TARGET)  # in meters
-            miss_km = miss / 1e3  # in km
+            miss = abs(r - R_TARGET)
+            miss_km = miss / 1e3
+
             if miss < R_TOL:
+                # landed within 20km -- big reward, proportional to precision
                 reward += 100.0 - 100.0 * (miss / R_TOL)
+
+            elif miss < 3 * R_TOL:
+                # landed within 60km -- small penalty, encourage improvement
+                reward -= 20.0 * (miss / R_TOL)
+
             else:
-                reward -= np.exp(miss_km/50) - 1  # your linear penalty
+                # your hard constraint -- too far, you're dead
+                reward -= 500.0
 
         info = {
             't':     self.t,
