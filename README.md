@@ -58,8 +58,47 @@ hypersonic-reentry-guidance/
 | Entry flight path angle | -5.5 deg |
 
 ---
+## Update
 
+### Phase 1 — Dynamics and Environment
+- [x] 3DOF equations of motion (range-altitude plane)
+- [x] Exponential atmosphere model
+- [x] Chapman stagnation heating model
+- [x] Custom Gymnasium environment with reward shaping
+- [x] Baseline trajectory simulation and visualization
 
+### Phase 2 — Reference Trajectory Generation
+- [x] Predictor-corrector guidance baseline
+- [x] Atmospheric uncertainty sensitivity analysis
+- [x] Trajectory visualization and constraint verification
+
+### Phase 3 — Reinforcement Learning Policy
+- [x] PPO training on nominal environment
+- [x] Domain randomization over atmospheric density and entry conditions
+- [x] Policy evaluation against classical baseline
+
+### Phase 4 — Analysis
+- [x] Atmospheric uncertainty comparison (PC vs PPO)
+- [x] Miss distance analysis across ±20% density perturbations
+
+---
+
+## Results
+
+| Method | Nominal Miss | Miss at +10% Density | Consistency |
+|---|---|---|---|
+| Predictor-Corrector | 8.6 km | 17.9 km | Variable |
+| PPO Agent (2M steps) | 37.6 km | 35.0 km | Very consistent |
+
+The predictor-corrector achieves higher precision under nominal conditions.
+The PPO agent demonstrates significantly more consistent behavior across
+atmospheric perturbations, with miss distance varying by only ±6 km across
+±20% density changes vs ±10 km for the classical method.
+
+With additional training compute (10M+ steps), the PPO policy would likely
+converge below the 20 km tolerance threshold while maintaining its robustness advantage.
+
+![Comparison Plot](results/comparison_plot.png)
 
 ## References
 
